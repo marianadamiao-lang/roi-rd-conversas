@@ -6,129 +6,175 @@
 <title>Calculadora de ROI — RD Station Conversas</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0D1B2A; color: #F4F7FA; min-height: 100vh; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #F0F4F8; color: #1E293B; min-height: 100vh; }
 
   header { background: #00A896; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
   header h1 { font-size: 18px; font-weight: 600; color: #fff; }
-  header span { font-size: 13px; color: rgba(255,255,255,0.8); }
+  header span { font-size: 13px; color: rgba(255,255,255,0.85); }
 
   .container { max-width: 980px; margin: 0 auto; padding: 32px 24px; }
 
-  .intro { background: #1A2E45; border-radius: 12px; padding: 24px; margin-bottom: 28px; border-left: 4px solid #00A896; }
+  .intro { background: #fff; border-radius: 12px; padding: 24px; margin-bottom: 28px; border-left: 4px solid #00A896; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
   .intro h2 { font-size: 16px; font-weight: 600; color: #00A896; margin-bottom: 8px; }
-  .intro p { font-size: 14px; color: #94A3B8; line-height: 1.6; }
+  .intro p { font-size: 14px; color: #475569; line-height: 1.6; }
+  .intro p strong { color: #1E293B; }
 
-  .section-title { font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; }
+  .section-title { font-size: 11px; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; }
 
   .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
   @media (max-width: 640px) { .grid2 { grid-template-columns: 1fr; } }
 
-  .card { background: #1A2E45; border-radius: 12px; padding: 24px; }
-  .card h3 { font-size: 13px; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 20px; }
+  .card { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+  .card h3 { font-size: 11px; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 20px; }
 
   .field { margin-bottom: 20px; }
-  .field label { display: block; font-size: 13px; color: #94A3B8; margin-bottom: 6px; }
-  .field label strong { color: #F4F7FA; font-weight: 600; }
-  .field-hint { font-size: 11px; color: #475569; margin-bottom: 8px; font-style: italic; }
+  .field label { display: block; font-size: 14px; font-weight: 600; color: #1E293B; margin-bottom: 6px; }
+  .field-hint { font-size: 11px; color: #94A3B8; margin-bottom: 8px; font-style: italic; }
   .field-row { display: flex; align-items: center; gap: 12px; }
-  input[type="range"] { flex: 1; -webkit-appearance: none; height: 4px; border-radius: 2px; background: #0D1B2A; outline: none; }
+  input[type="range"] { flex: 1; -webkit-appearance: none; height: 4px; border-radius: 2px; background: #E2E8F0; outline: none; }
   input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #00A896; cursor: pointer; }
   .field-val { font-size: 14px; font-weight: 700; color: #00A896; min-width: 80px; text-align: right; }
 
-  .derived { background: #0D1B2A; border-radius: 8px; padding: 12px 14px; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; }
+  .derived { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px 14px; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; }
   .derived-label { font-size: 12px; color: #64748B; }
   .derived-val { font-size: 14px; font-weight: 700; color: #F59E0B; }
 
+  /* Yes/No toggle for repetitive */
+  .yn-row { display: flex; gap: 10px; margin-top: 6px; }
+  .yn-btn { flex: 1; padding: 10px; border: 2px solid #E2E8F0; border-radius: 8px; background: #fff; font-size: 13px; font-weight: 600; color: #64748B; cursor: pointer; transition: all 0.15s; text-align: center; }
+  .yn-btn:hover { border-color: #00A896; color: #00A896; }
+  .yn-btn.active-yes { border-color: #00A896; background: rgba(0,168,150,0.08); color: #00A896; }
+  .yn-btn.active-no { border-color: #94A3B8; background: #F8FAFC; color: #475569; }
+
+  /* Scenarios */
+  .scenarios { margin-top: 14px; display: none; }
+  .scenarios.visible { display: block; }
+  .scenarios-title { font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 10px; }
+  .scenario-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+  .scenario-card { background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 8px; padding: 12px 8px; text-align: center; cursor: pointer; transition: all 0.15s; }
+  .scenario-card:hover { border-color: #00A896; }
+  .scenario-card.active { border-color: #00A896; background: rgba(0,168,150,0.07); }
+  .sc-pct { font-size: 18px; font-weight: 800; color: #00A896; }
+  .sc-lbl { font-size: 10px; color: #64748B; margin-top: 2px; }
+  .sc-economia { font-size: 11px; font-weight: 600; color: #F59E0B; margin-top: 6px; }
+
+  .no-data-msg { margin-top: 10px; background: #FFF7ED; border: 1px solid #FED7AA; border-radius: 8px; padding: 10px 12px; font-size: 12px; color: #92400E; display: none; }
+  .no-data-msg.visible { display: block; }
+
   /* Toggle */
   .toggle-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-  .toggle-label { font-size: 13px; color: #94A3B8; }
+  .toggle-label { font-size: 13px; color: #475569; }
   .toggle-switch { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
   .toggle-switch input { opacity: 0; width: 0; height: 0; }
-  .toggle-slider { position: absolute; inset: 0; background: #1E3A5F; border-radius: 22px; cursor: pointer; transition: background 0.2s; }
-  .toggle-slider:before { content: ''; position: absolute; width: 16px; height: 16px; left: 3px; top: 3px; background: #64748B; border-radius: 50%; transition: transform 0.2s, background 0.2s; }
-  .toggle-switch input:checked + .toggle-slider { background: rgba(239,68,68,0.25); }
-  .toggle-switch input:checked + .toggle-slider:before { transform: translateX(18px); background: #EF4444; }
+  .toggle-slider { position: absolute; inset: 0; background: #CBD5E1; border-radius: 22px; cursor: pointer; transition: background 0.2s; }
+  .toggle-slider:before { content: ''; position: absolute; width: 16px; height: 16px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+  .toggle-switch input:checked + .toggle-slider { background: rgba(239,68,68,0.35); }
+  .toggle-switch input:checked + .toggle-slider:before { transform: translateX(18px); }
 
   /* Blindspot */
-  .blindspot { background: rgba(239,68,68,0.07); border: 1.5px solid rgba(239,68,68,0.3); border-radius: 10px; padding: 16px; margin-top: 6px; display: none; }
+  .blindspot { background: #FEF2F2; border: 1.5px solid #FECACA; border-radius: 10px; padding: 16px; margin-top: 6px; display: none; }
   .blindspot.visible { display: block; }
-  .blindspot-title { font-size: 13px; font-weight: 700; color: #EF4444; margin-bottom: 10px; }
+  .blindspot-title { font-size: 13px; font-weight: 700; color: #DC2626; margin-bottom: 10px; }
   .bs-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
-  .bs-stat { background: #0D1B2A; border-radius: 8px; padding: 10px; text-align: center; }
-  .bs-val { font-size: 17px; font-weight: 700; color: #EF4444; margin-bottom: 2px; }
-  .bs-lbl { font-size: 10px; color: #64748B; line-height: 1.4; }
-  .blindspot-msg { font-size: 12px; color: #94A3B8; line-height: 1.6; background: #0D1B2A; border-radius: 8px; padding: 10px 12px; border-left: 3px solid #EF4444; }
-  .blindspot-msg strong { color: #F4F7FA; }
+  .bs-stat { background: #fff; border-radius: 8px; padding: 10px; text-align: center; border: 1px solid #FECACA; }
+  .bs-val { font-size: 17px; font-weight: 700; color: #DC2626; margin-bottom: 2px; }
+  .bs-lbl { font-size: 10px; color: #94A3B8; line-height: 1.4; }
+  .blindspot-msg { font-size: 12px; color: #7F1D1D; line-height: 1.6; background: #fff; border-radius: 8px; padding: 10px 12px; border-left: 3px solid #EF4444; }
+  .blindspot-msg strong { color: #1E293B; }
 
   .conv-slider { display: none; }
   .conv-slider.visible { display: block; }
 
   /* Results */
-  .results { background: #1A2E45; border-radius: 12px; padding: 24px; margin-bottom: 20px; }
-  .results h3 { font-size: 13px; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 18px; }
+  .results { background: #fff; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+  .results h3 { font-size: 11px; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 18px; }
   .result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
   @media (max-width: 540px) { .result-grid { grid-template-columns: 1fr 1fr; } }
-  .stat { background: #0D1B2A; border-radius: 8px; padding: 14px; text-align: center; }
+  .stat { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 14px; text-align: center; position: relative; }
   .stat-val { font-size: 20px; font-weight: 700; color: #00A896; margin-bottom: 4px; }
   .stat-lbl { font-size: 11px; color: #64748B; line-height: 1.4; }
-  .stat.dimmed .stat-val { color: #334155; }
-  .stat.dimmed .stat-lbl { color: #334155; }
+  .stat.dimmed .stat-val { color: #CBD5E1; }
+  .stat.dimmed .stat-lbl { color: #CBD5E1; }
+
+  /* Tooltip */
+  .tip-icon { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; border-radius: 50%; background: #E2E8F0; color: #64748B; font-size: 10px; font-weight: 700; cursor: help; position: absolute; top: 8px; right: 8px; }
+  .tip-icon:hover::after { content: attr(data-tip); position: absolute; bottom: 120%; right: 0; background: #1E293B; color: #fff; font-size: 11px; font-weight: 400; padding: 6px 10px; border-radius: 6px; white-space: normal; width: 200px; line-height: 1.4; z-index: 10; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
 
   /* Rational */
-  .rational { background: #0D1B2A; border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1px solid #1E3A5F; }
-  .rational-title { font-size: 12px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 12px; }
-  .rational-row { display: flex; justify-content: space-between; align-items: baseline; padding: 6px 0; border-bottom: 1px solid #1A2E45; font-size: 12px; gap: 8px; }
+  .rational { background: #F8FAFC; border-radius: 10px; padding: 16px; margin-bottom: 16px; border: 1px solid #E2E8F0; }
+  .rational-title { font-size: 11px; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 12px; }
+  .rational-row { display: flex; justify-content: space-between; align-items: baseline; padding: 7px 0; border-bottom: 1px solid #E2E8F0; font-size: 12px; gap: 8px; }
   .rational-row:last-child { border-bottom: none; }
   .rational-desc { color: #64748B; flex: 1; }
   .rational-formula { color: #94A3B8; font-size: 11px; font-style: italic; flex: 1; text-align: center; }
-  .rational-result { color: #F4F7FA; font-weight: 600; text-align: right; min-width: 90px; }
+  .rational-result { color: #1E293B; font-weight: 600; text-align: right; min-width: 90px; }
   .rational-result.highlight { color: #00A896; }
 
   .roi-box { background: #00A896; border-radius: 10px; padding: 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-  .roi-box-left h4 { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.9); }
-  .roi-box-left p { font-size: 12px; color: rgba(255,255,255,0.65); margin-top: 4px; max-width: 480px; }
+  .roi-box-left h4 { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.95); }
+  .roi-box-left p { font-size: 12px; color: rgba(255,255,255,0.75); margin-top: 4px; max-width: 480px; }
   .roi-number { font-size: 48px; font-weight: 800; color: #fff; white-space: nowrap; }
 
-  /* Benchmark tables */
-  .benchmark { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
-  @media (max-width: 640px) { .benchmark { grid-template-columns: 1fr; } }
-  .bench-card { background: #1A2E45; border-radius: 12px; padding: 20px; }
-  .bench-card h3 { font-size: 13px; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 14px; }
-  .compare-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #0D1B2A; font-size: 13px; }
+  /* Benchmark */
+  .benchmark-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  @media (max-width: 640px) { .benchmark-wrap { grid-template-columns: 1fr; } }
+  .bench-card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+  .bench-card h3 { font-size: 11px; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 14px; }
+  .compare-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #F1F5F9; font-size: 13px; }
   .compare-row:last-child { border-bottom: none; }
-  .compare-dim { color: #94A3B8; }
-  .bench-source { font-size: 10px; color: #334155; margin-top: 12px; font-style: italic; }
+  .compare-dim { color: #475569; font-weight: 500; }
+  .bench-source { font-size: 10px; color: #CBD5E1; margin-top: 12px; font-style: italic; }
   .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
-  .badge-g { background: rgba(16,185,129,0.15); color: #10B981; }
-  .badge-r { background: rgba(239,68,68,0.15); color: #EF4444; }
-  .badge-y { background: rgba(245,158,11,0.15); color: #F59E0B; }
+  .badge-g { background: rgba(16,185,129,0.12); color: #059669; }
+  .badge-r { background: rgba(239,68,68,0.1); color: #DC2626; }
+  .badge-y { background: rgba(245,158,11,0.1); color: #B45309; }
 
-  /* Perguntas */
-  .perguntas { background: #1A2E45; border-radius: 12px; padding: 24px; margin-bottom: 20px; }
-  .perguntas h3 { font-size: 13px; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 18px; }
-  .pergunta-item { margin-bottom: 14px; background: #0D1B2A; border-radius: 10px; overflow: hidden; }
-  .pergunta-item:last-child { margin-bottom: 0; }
-  .pergunta-q { font-size: 13px; font-weight: 600; color: #00A896; padding: 12px 16px 10px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; }
-  .pergunta-q .arrow { font-size: 11px; color: #475569; transition: transform 0.2s; }
-  .pergunta-q.open .arrow { transform: rotate(180deg); }
-  .pergunta-a { font-size: 13px; color: #94A3B8; line-height: 1.65; padding: 0 16px 14px; display: none; }
-  .pergunta-a.open { display: block; }
-  .pergunta-tip { display: inline-block; margin-top: 8px; font-size: 11px; color: #F59E0B; background: rgba(245,158,11,0.1); padding: 4px 10px; border-radius: 6px; }
+  /* Risk card */
+  .risk-card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+  .risk-card h3 { font-size: 11px; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 14px; }
+  .risk-row { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid #F1F5F9; }
+  .risk-row:last-child { border-bottom: none; }
+  .risk-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .risk-body { flex: 1; }
+  .risk-title { font-size: 12px; font-weight: 700; color: #1E293B; margin-bottom: 3px; }
+  .risk-desc { font-size: 11px; color: #64748B; line-height: 1.5; }
+  .risk-stat { display: inline-block; margin-top: 4px; font-size: 11px; font-weight: 700; color: #DC2626; background: #FEF2F2; padding: 2px 8px; border-radius: 6px; }
 
-  /* Casos de uso */
-  .casos { background: #1A2E45; border-radius: 12px; padding: 24px; margin-bottom: 20px; }
-  .casos h3 { font-size: 13px; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 6px; }
-  .casos-sub { font-size: 12px; color: #475569; margin-bottom: 18px; }
-  .caso-card { background: #0D1B2A; border-radius: 10px; padding: 16px; margin-bottom: 12px; border-left: 3px solid #00A896; }
-  .caso-card:last-child { margin-bottom: 0; }
-  .caso-title { font-size: 13px; font-weight: 700; color: #F4F7FA; margin-bottom: 6px; }
-  .caso-desafio { font-size: 12px; color: #64748B; margin-bottom: 8px; }
-  .caso-solucao { font-size: 12px; color: #94A3B8; line-height: 1.6; margin-bottom: 10px; }
-  .caso-link { font-size: 11px; color: #00A896; text-decoration: none; }
+  /* Perguntas grid */
+  .perguntas { background: #fff; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+  .perguntas h3 { font-size: 11px; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+  .perguntas-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+  @media (max-width: 640px) { .perguntas-grid { grid-template-columns: 1fr; } }
+  .pq-card { background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 10px; overflow: hidden; cursor: pointer; transition: border-color 0.15s; }
+  .pq-card:hover { border-color: #00A896; }
+  .pq-card.open { border-color: #00A896; background: #fff; }
+  .pq-top { display: flex; align-items: flex-start; gap: 10px; padding: 14px; }
+  .pq-icon { font-size: 22px; flex-shrink: 0; }
+  .pq-q { font-size: 13px; font-weight: 600; color: #1E293B; flex: 1; line-height: 1.4; }
+  .pq-arrow { font-size: 10px; color: #94A3B8; flex-shrink: 0; margin-top: 3px; transition: transform 0.2s; }
+  .pq-card.open .pq-arrow { transform: rotate(180deg); }
+  .pq-a { font-size: 12px; color: #475569; line-height: 1.65; padding: 0 14px 14px 46px; display: none; }
+  .pq-a.open { display: block; }
+  .pergunta-tip { display: inline-block; margin-top: 8px; font-size: 11px; color: #B45309; background: rgba(245,158,11,0.1); padding: 3px 8px; border-radius: 6px; }
+
+  /* Casos grid */
+  .casos { background: #fff; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+  .casos h3 { font-size: 11px; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px; }
+  .casos-sub { font-size: 12px; color: #94A3B8; margin-bottom: 16px; }
+  .casos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  @media (max-width: 720px) { .casos-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 480px) { .casos-grid { grid-template-columns: 1fr; } }
+  .caso-visual { background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 8px; transition: border-color 0.15s; }
+  .caso-visual:hover { border-color: #00A896; }
+  .caso-emoji { font-size: 32px; text-align: center; padding: 10px 0 4px; }
+  .caso-tag { display: inline-block; font-size: 10px; font-weight: 600; color: #059669; background: rgba(0,168,150,0.1); padding: 2px 8px; border-radius: 6px; text-align: center; }
+  .caso-title { font-size: 13px; font-weight: 700; color: #1E293B; line-height: 1.3; }
+  .caso-desafio { font-size: 11px; color: #94A3B8; line-height: 1.5; }
+  .caso-solucao { font-size: 12px; color: #475569; line-height: 1.55; flex: 1; }
+  .caso-link { font-size: 11px; color: #00A896; text-decoration: none; font-weight: 600; }
   .caso-link:hover { text-decoration: underline; }
-  .caso-tag { display: inline-block; font-size: 10px; font-weight: 600; color: #1D9E75; background: rgba(0,168,150,0.12); padding: 2px 8px; border-radius: 6px; margin-bottom: 8px; }
 
-  footer { text-align: center; padding: 24px; font-size: 11px; color: #334155; line-height: 1.6; }
+  footer { text-align: center; padding: 28px 24px; font-size: 11px; color: #94A3B8; line-height: 1.7; }
 </style>
 </head>
 <body>
@@ -142,17 +188,17 @@
 
   <div class="intro">
     <h2>Como usar esta ferramenta</h2>
-    <p>Preencha os campos abaixo com os dados do cliente durante a reunião <strong>Se o cliente não souber um dado, use as opções de perfil — elas já estimam por você.</strong> Mostre ao cliente o número de ROI .</p>
+    <p>Preencha os campos abaixo com os dados do prospect durante a descoberta. <strong>Se o cliente não souber um dado, use as estimativas de cenário.</strong> Mostre o número de ROI antes de revelar o preço da ferramenta.</p>
   </div>
 
-  <!-- ── BLOCO 1: CUSTO OPERACIONAL ── -->
-  <p class="section-title">1. Calculando o custo atual de atendimento</p>
+  <!-- ── BLOCO 1 ── -->
+  <p class="section-title">1. Custo atual de atendimento</p>
   <div class="grid2" style="margin-bottom: 8px;">
     <div class="card">
       <h3>Equipe de atendimento</h3>
 
       <div class="field">
-        <label><strong>Quantas pessoas fazem atendimento?</strong></label>
+        <label>Quantas pessoas fazem atendimento?</label>
         <div class="field-hint">Inclua todos que respondem clientes — WhatsApp, telefone, chat, e-mail.</div>
         <div class="field-row">
           <input type="range" min="1" max="50" step="1" value="3" id="s-func" oninput="calc()">
@@ -161,7 +207,7 @@
       </div>
 
       <div class="field">
-        <label><strong>Salário médio por atendente (R$)</strong></label>
+        <label>Salário médio por atendente (R$)</label>
         <div class="field-hint">Salário + encargos. Estimativa comum para atendente CLT: R$2.500–R$4.000.</div>
         <div class="field-row">
           <input type="range" min="1500" max="8000" step="100" value="3000" id="s-salario" oninput="calc()">
@@ -170,8 +216,8 @@
       </div>
 
       <div class="field">
-        <label><strong>% do tempo dedicado ao atendimento</strong></label>
-        <div class="field-hint">Quanto do dia do funcionário é gasto em atendimento? Ex: se responde clientes o dia todo = 100%. Se divide com outras tarefas = 50%.</div>
+        <label>% do tempo dedicado ao atendimento</label>
+        <div class="field-hint">Se responde clientes o dia todo = 100%. Se divide com outras tarefas = 50%.</div>
         <div class="field-row">
           <input type="range" min="10" max="100" step="5" value="70" id="s-tempo" oninput="calc()">
           <span class="field-val" id="v-tempo">70%</span>
@@ -180,58 +226,79 @@
 
       <div class="derived">
         <span class="derived-label">Custo mensal de atendimento estimado</span>
-        <span class="derived-val" id="d-custo-total">R$0</span>
+        <span class="derived-val" id="d-custo-total">R$6.300</span>
       </div>
     </div>
 
     <div class="card">
-      <h3>Volume e perfil de tickets</h3>
+      <h3>Volume e perfil de atendimentos</h3>
 
       <div class="field">
-        <label><strong>Conversas comerciais por mês</strong></label>
-        <div class="field-hint">Número de conversas com potencial de venda ou atendimento pré/pós-venda que o time trata por mês — WhatsApp, chat, telefone, e-mail. Pode ser aproximado.</div>
+        <label>Atendimentos por mês</label>
+        <div class="field-hint">Número de atendimentos que o time resolve por mês — WhatsApp, chat, telefone, e-mail. Pode ser aproximado.</div>
         <div class="field-row">
           <input type="range" min="10" max="10000" step="10" value="200" id="s-atend" oninput="calc()">
           <span class="field-val" id="v-atend">200</span>
         </div>
         <div class="derived" style="margin-top: 8px;">
-          <span class="derived-label">Custo estimado por conversa</span>
+          <span class="derived-label">Custo estimado por atendimento</span>
           <span class="derived-val" id="d-custo-por">R$0</span>
         </div>
       </div>
 
       <div class="field">
-        <label><strong>Qual % dessas conversas são perguntas simples e repetitivas?</strong></label>
-        <div class="field-hint">Perguntas simples são aquelas que o atendente responde sempre da mesma forma: "qual o horário?", "ainda tem em estoque?", "como remarco?", "prazo de entrega?", "segunda via do boleto?", "qual o preço?". Se não souber, comece com 0% e ajuste conforme a conversa.</div>
-        <div class="field-row">
-          <input type="range" min="0" max="90" step="5" value="50" id="s-auto" oninput="calc()">
-          <span class="field-val" id="v-auto">50%</span>
+        <label>O seu time precisa responder perguntas simples e repetitivas?</label>
+        <div class="field-hint">Ex: horário de funcionamento, status de pedido, preço, como remarcar, segunda via de boleto, prazo de entrega.</div>
+        <div class="yn-row">
+          <button class="yn-btn active-yes" id="btn-sim" onclick="selectRepetitivo('sim')">✓ Sim</button>
+          <button class="yn-btn" id="btn-nao" onclick="selectRepetitivo('nao')">✗ Não / Não sabe</button>
         </div>
-        <div class="derived" style="margin-top: 8px;">
-          <span class="derived-label">Conversas automatizáveis estimadas/mês</span>
-          <span class="derived-val" id="d-tickets-auto">0</span>
+
+        <div class="scenarios visible" id="scenarios-box">
+          <div class="scenarios-title">Se sim — escolha o cenário que melhor descreve a operação:</div>
+          <div class="scenario-cards">
+            <div class="scenario-card" id="sc10" onclick="selectScenario(10)">
+              <div class="sc-pct">10%</div>
+              <div class="sc-lbl">Poucos atendimentos repetitivos</div>
+              <div class="sc-economia" id="sc10-val">—</div>
+            </div>
+            <div class="scenario-card active" id="sc30" onclick="selectScenario(30)">
+              <div class="sc-pct">30%</div>
+              <div class="sc-lbl">Cenário mais comum</div>
+              <div class="sc-economia" id="sc30-val">—</div>
+            </div>
+            <div class="scenario-card" id="sc50" onclick="selectScenario(50)">
+              <div class="sc-pct">50%</div>
+              <div class="sc-lbl">Alto volume repetitivo</div>
+              <div class="sc-economia" id="sc50-val">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="no-data-msg" id="no-repetitivo-msg">
+          Sem atendimentos repetitivos, o argumento de automação não se aplica diretamente. Foque nos ganhos de receita e nos benchmarks de mercado abaixo.
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ── BLOCO 2: RECEITA ── -->
+  <!-- ── BLOCO 2 ── -->
   <p class="section-title" style="margin-top: 8px;">2. Potencial de receita via WhatsApp</p>
   <div class="grid2" style="margin-bottom: 20px;">
     <div class="card">
       <h3>Dados de leads</h3>
 
       <div class="field">
-        <label><strong>Leads por mês via WhatsApp</strong></label>
-        <div class="field-hint">Quantas pessoas entram em contato pelo WhatsApp com intenção de compra ou dúvidas comerciais.</div>
+        <label>Atendimentos com potencial comercial por mês</label>
+        <div class="field-hint">Quantas pessoas entram em contato com intenção de compra ou dúvidas comerciais pelo WhatsApp.</div>
         <div class="field-row">
-          <input type="range" min="0" max="3000" step="50" value="300" id="s-leads" oninput="calc()">
+          <input type="range" min="0" max="3000" step="10" value="300" id="s-leads" oninput="calc()">
           <span class="field-val" id="v-leads">300</span>
         </div>
       </div>
 
       <div class="field">
-        <label><strong>Ticket médio (R$)</strong></label>
+        <label>Ticket médio (R$)</label>
         <div class="field-hint">Valor médio de uma venda fechada.</div>
         <div class="field-row">
           <input type="range" min="50" max="10000" step="50" value="500" id="s-ticket" oninput="calc()">
@@ -242,20 +309,19 @@
 
     <div class="card">
       <h3>Taxa de conversão</h3>
-
       <div class="field">
-        <label><strong>O prospect sabe a taxa de conversão pelo WhatsApp?</strong></label>
-        <div class="toggle-row" style="margin-top: 6px;">
+        <label>O prospect sabe a taxa de conversão pelo WhatsApp?</label>
+        <div class="toggle-row" style="margin-top: 8px;">
           <span class="toggle-label">Sim, sabe</span>
           <label class="toggle-switch">
             <input type="checkbox" id="toggle-blind" onchange="toggleBlind()">
             <span class="toggle-slider"></span>
           </label>
-          <span class="toggle-label" style="color:#EF4444; font-weight:600;">Não sabe</span>
+          <span class="toggle-label" style="color:#DC2626; font-weight:600;">Não sabe</span>
         </div>
 
         <div class="conv-slider visible" id="conv-known">
-          <div class="field-hint">De cada 100 leads que entram em contato, quantos fecham? Ex: 5 = 5%.</div>
+          <div class="field-hint">De cada 100 leads que entram em contato, quantos fecham?</div>
           <div class="field-row">
             <input type="range" min="1" max="25" step="1" value="5" id="s-conv" oninput="calc()">
             <span class="field-val" id="v-conv">5%</span>
@@ -267,35 +333,36 @@
           <div class="bs-stats">
             <div class="bs-stat">
               <div class="bs-val" id="bs1">—</div>
-              <div class="bs-lbl">Receita potencial perdida/mês<br>(benchmark: 5% conv.)</div>
+              <div class="bs-lbl">Receita potencial perdida/mês (benchmark 5% conv.)</div>
             </div>
             <div class="bs-stat">
               <div class="bs-val" id="bs2">—</div>
-              <div class="bs-lbl">Leads sem follow-up<br>adequado estimado</div>
+              <div class="bs-lbl">Atendimentos sem follow-up adequado estimado</div>
             </div>
           </div>
           <div class="blindspot-msg">
-            <strong>Atenção:</strong> "Você não sabe a taxa de conversão porque não tem esse dado centralizado e isso por si só já é um custo. Com os dashboards do RD Station Conversas você teria essa resposta em tempo real, e poderia agir antes de perder o lead."
+            <strong>Como usar na conversa:</strong> "Você não sabe a taxa de conversão porque não tem esse dado centralizado — e isso já é um custo. Com os dashboards do RD Station Conversas você teria essa resposta em tempo real, e poderia agir antes de perder o lead."
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ── PLANO ── -->
-  <p class="section-title" style="margin-top: 8px;">3. Valor do plano</p>
+  <!-- ── BLOCO 3: PLANO ── -->
+  <p class="section-title">3. Valor do plano</p>
   <div class="card" style="margin-bottom: 20px;">
     <h3>Investimento no RD Station Conversas</h3>
-    <div class="field">
-      <label><strong>Qual o valor mensal do plano que o cliente pagaria? (R$)</strong></label>
-      <div class="field-hint">Preencha com o valor do plano que faz sentido para o perfil deste prospect. O investimento anual será calculado automaticamente.</div>
+    <div class="field" style="margin-bottom: 0;">
+      <label>Qual o valor mensal do plano que o cliente pagaria? (R$)</label>
+      <div class="field-hint">Preencha com o valor do plano adequado para o perfil do prospect. O investimento anual é calculado automaticamente.</div>
       <div class="field-row">
-        <input type="range" min="200" max="5000" step="50" value="1000" id="s-plano" oninput="calc()">
-        <span class="field-val" id="v-plano">R$1.000/mês</span>
+        <input type="range" min="1300" max="6000" step="50" value="1300" id="s-plano" oninput="calc()">
+        <span class="field-val" id="v-plano">R$1.300/mês</span>
       </div>
       <div class="derived" style="margin-top: 10px;">
         <span class="derived-label">Investimento anual total</span>
-        <span class="derived-val" id="d-plano-anual">R$12.000</span>
+        <span class="derived-val" id="d-plano-anual">R$15.600</span>
+      <p style="font-size:11px; color:#94A3B8; margin-top:10px;">* O valor considera apenas o valor do plano, sem considerar os gastos de conversas cobrados pela Meta.</p>
       </div>
     </div>
   </div>
@@ -304,51 +371,63 @@
   <div class="results">
     <h3>Resultado estimado para este prospect</h3>
 
-    <div class="result-grid">
+    <div class="result-grid" style="grid-template-columns: repeat(4,1fr);">
       <div class="stat" id="stat-economia">
+        <span class="tip-icon" data-tip="Custo mensal × % de atendimentos repetitivos (cenário selecionado). Representa o tempo do time liberado por automação total de atendimentos que não precisam de humano.">i</span>
         <div class="stat-val" id="r-economia">R$0</div>
-        <div class="stat-lbl">Economia mensal<br>(custo operacional)</div>
+        <div class="stat-lbl">Economia c/<br>automação total</div>
+      </div>
+      <div class="stat" id="stat-parcial">
+        <span class="tip-icon" data-tip="Estimativa de 15% do custo mensal de atendimento: representa o tempo economizado com automação parcial — primeira resposta 24/7, coleta de nome e e-mail, mensagem de boas-vindas fora do horário comercial. Mesmo atendimentos que precisam de humano ganham eficiência com a triagem inicial automatizada.">i</span>
+        <div class="stat-val" id="r-parcial">R$0</div>
+        <div class="stat-lbl">Economia c/<br>automação parcial</div>
       </div>
       <div class="stat" id="stat-receita">
+        <span class="tip-icon" data-tip="Leads × 5% de melhora de conversão × ticket médio. Os 5% representam o ganho estimado com respostas mais rápidas e consistentes via automação.">i</span>
         <div class="stat-val" id="r-receita">R$0</div>
-        <div class="stat-lbl" id="r-receita-lbl">Receita incremental<br>(melhora conversão +5%)</div>
+        <div class="stat-lbl" id="r-receita-lbl">Receita incremental<br>(+5% conversão)</div>
       </div>
       <div class="stat" id="stat-anual">
+        <span class="tip-icon" data-tip="(Economia total + Economia parcial + Receita incremental) × 12 meses. Não considera ganhos de retenção, NPS e dados operacionais.">i</span>
         <div class="stat-val" id="r-anual">R$0</div>
         <div class="stat-lbl">Ganho total<br>estimado em 12 meses</div>
       </div>
     </div>
 
-    <!-- RACIONAL -->
     <div class="rational">
       <div class="rational-title">Como chegamos nesses números</div>
       <div class="rational-row">
-        <span class="rational-desc">Custo mensal de atendimento atual</span>
+        <span class="rational-desc">Custo mensal de atendimento</span>
         <span class="rational-formula" id="f1">—</span>
         <span class="rational-result" id="rr1">—</span>
       </div>
       <div class="rational-row">
-        <span class="rational-desc">Conversas automatizáveis (% simples e repetitivas)</span>
+        <span class="rational-desc">Atendimentos automatizáveis (cenário selecionado)</span>
         <span class="rational-formula" id="f2">—</span>
         <span class="rational-result" id="rr2">—</span>
       </div>
       <div class="rational-row">
-        <span class="rational-desc">Economia mensal com automação</span>
+        <span class="rational-desc">Economia com automação total</span>
         <span class="rational-formula" id="f3">—</span>
         <span class="rational-result highlight" id="rr3">—</span>
       </div>
+      <div class="rational-row">
+        <span class="rational-desc">Economia com automação parcial (primeira resposta, coleta de dados, 24/7)</span>
+        <span class="rational-formula" id="f3b">custo mensal × 15%</span>
+        <span class="rational-result highlight" id="rr3b">—</span>
+      </div>
       <div class="rational-row" id="rational-receita-row">
-        <span class="rational-desc">Receita incremental (5% a mais de conversão)</span>
+        <span class="rational-desc">Receita incremental (+5% conversão)</span>
         <span class="rational-formula" id="f4">—</span>
         <span class="rational-result highlight" id="rr4">—</span>
       </div>
       <div class="rational-row">
-        <span class="rational-desc">Ganho total anual (economia + receita) × 12</span>
+        <span class="rational-desc">Ganho total anual</span>
         <span class="rational-formula" id="f5">—</span>
         <span class="rational-result highlight" id="rr5">—</span>
       </div>
       <div class="rational-row">
-        <span class="rational-desc">Investimento anual no plano escolhido</span>
+        <span class="rational-desc">Investimento anual no plano</span>
         <span class="rational-formula" id="f6">—</span>
         <span class="rational-result" id="rr6">—</span>
       </div>
@@ -363,115 +442,241 @@
     </div>
   </div>
 
-  <!-- ── BENCHMARK ── -->
+  <!-- ── BENCHMARKS ── -->
   <p class="section-title">Benchmarks de mercado</p>
-  <div class="benchmark">
+  <p style="font-size:12px; color:#94A3B8; margin-bottom:14px;">Use estes dados com leads que ainda não têm visibilidade da operação ou que questionam a necessidade da ferramenta.</p>
+
+  <div class="benchmark-wrap" style="margin-bottom: 16px;">
     <div class="bench-card">
       <h3>Chatbot simples vs IA conversacional</h3>
-      <div class="compare-row"><span class="compare-dim">Custo por interação</span><div><span class="badge badge-y">~R$1,50</span> → <span class="badge badge-g">~R$0,50</span></div></div>
       <div class="compare-row"><span class="compare-dim">Taxa de resolução</span><div><span class="badge badge-y">30–50%</span> → <span class="badge badge-g">60–86%</span></div></div>
       <div class="compare-row"><span class="compare-dim">Entende contexto</span><div><span class="badge badge-r">Não</span> → <span class="badge badge-g">Sim</span></div></div>
       <div class="compare-row"><span class="compare-dim">Personalização</span><div><span class="badge badge-r">Nenhuma</span> → <span class="badge badge-g">Alta</span></div></div>
       <div class="compare-row"><span class="compare-dim">ROI médio (12–18m)</span><div><span class="badge badge-y">50–80%</span> → <span class="badge badge-g">148–210%</span></div></div>
       <div class="bench-source">Fontes: Forrester (2024), Freshworks CX Benchmark 2025, ResearchGate</div>
     </div>
+
     <div class="bench-card">
       <h3>Humano puro vs IA + humano híbrido</h3>
-      <div class="compare-row"><span class="compare-dim">Custo por interação</span><div><span class="badge badge-r">~R$30</span> → <span class="badge badge-g">~R$8–12</span></div></div>
-      <div class="compare-row"><span class="compare-dim">Disponibilidade</span><div><span class="badge badge-r">Comercial</span> → <span class="badge badge-g">24/7</span></div></div>
-      <div class="compare-row"><span class="compare-dim">Primeiro tempo de resposta</span><div><span class="badge badge-r">> 6h</span> → <span class="badge badge-g">< 4min</span></div></div>
+      <div class="compare-row"><span class="compare-dim">Disponibilidade</span><div><span class="badge badge-r">Horário comercial</span> → <span class="badge badge-g">24/7</span></div></div>
+      <div class="compare-row"><span class="compare-dim">Primeiro tempo de resposta</span><div><span class="badge badge-r">> 6h</span> → <span class="badge badge-g">< 4 min</span></div></div>
       <div class="compare-row"><span class="compare-dim">Escalar volume</span><div><span class="badge badge-r">Contratar</span> → <span class="badge badge-g">Configurar</span></div></div>
-      <div class="compare-row"><span class="compare-dim">Redução de custo</span><div><span class="badge badge-r">0%</span> → <span class="badge badge-g">30–55%</span></div></div>
-      <div class="bench-source">Fontes: Gartner (2024), Nielsen Norman Group, Pylon Research 2025</div>
+      <div class="bench-source">Fontes: Gartner (2024), Pylon Research 2025</div>
+    </div>
+  </div>
+
+  <!-- ── RISCO DE NÃO USAR API OFICIAL ── -->
+  <div class="benchmark-wrap" style="margin-bottom: 20px;">
+    <div class="risk-card">
+      <h3>Risco de não usar a API oficial do WhatsApp</h3>
+      <div class="risk-row">
+        <div class="risk-icon">🚫</div>
+        <div class="risk-body">
+          <div class="risk-title">Bloqueio temporário imediato</div>
+          <div class="risk-desc">Envio em massa sem API oficial é detectado automaticamente pela Meta. O número pode ser bloqueado sem aviso prévio.</div>
+          <span class="risk-stat">1 a 7 dias de bloqueio por violação</span>
+        </div>
+      </div>
+      <div class="risk-row">
+        <div class="risk-icon">⛔</div>
+        <div class="risk-body">
+          <div class="risk-title">Suspensão prolongada ou banimento permanente</div>
+          <div class="risk-desc">Em casos graves ou reincidentes, a Meta suspende o número por 5, 7 ou 30 dias. Se o banimento for permanente, o número é perdido para sempre — junto com todo o histórico de conversas.</div>
+          <span class="risk-stat">30 dias ou banimento permanente</span>
+        </div>
+      </div>
+      <div class="risk-row">
+        <div class="risk-icon">📉</div>
+        <div class="risk-body">
+          <div class="risk-title">Limite de envio reduzido progressivamente</div>
+          <div class="risk-desc">Quando usuários marcam mensagens como spam, a Meta reduz o volume máximo de mensagens do número — de milhares para algumas dezenas por dia.</div>
+          <span class="risk-stat">Capacidade de envio pode cair 90%+</span>
+        </div>
+      </div>
+      <div class="risk-row">
+        <div class="risk-icon">⏳</div>
+        <div class="risk-body">
+          <div class="risk-title">Revisão de conta leva 24–48h</div>
+          <div class="risk-desc">Mesmo após solicitar revisão à Meta, o processo leva de 24 a 48 horas úteis. Durante esse período, a empresa fica sem o canal principal de atendimento.</div>
+          <span class="risk-stat">24–48h sem atendimento via WhatsApp</span>
+        </div>
+      </div>
+      <div class="bench-source">Fontes: Meta Business Messaging Policy, ycloud.com, chakrahq.com (2025)</div>
+    </div>
+
+    <div class="risk-card">
+      <h3>O que empresas perdem sem automação de atendimento</h3>
+      <div class="risk-row">
+        <div class="risk-icon">🛒</div>
+        <div class="risk-body">
+          <div class="risk-title">Abandono de compra por falta de suporte rápido</div>
+          <div class="risk-desc">Quando clientes não conseguem suporte imediato, a maioria desiste da compra — e não volta.</div>
+          <span class="risk-stat">67% abandonam a compra sem suporte rápido</span>
+        </div>
+      </div>
+      <div class="risk-row">
+        <div class="risk-icon">💸</div>
+        <div class="risk-body">
+          <div class="risk-title">Custo operacional desnecessariamente alto</div>
+          <div class="risk-desc">Empresas gastam entre 15% e 25% da receita operacional com atendimento ao cliente. Grande parte disso pode ser automatizado.</div>
+          <span class="risk-stat">15–25% da receita operacional em atendimento</span>
+        </div>
+      </div>
+      <div class="risk-row">
+        <div class="risk-icon">🔁</div>
+        <div class="risk-body">
+          <div class="risk-title">Time gasta tempo com perguntas repetitivas</div>
+          <div class="risk-desc">A maioria dos atendimentos são perguntas que poderiam ser resolvidas automaticamente, sem precisar de um humano.</div>
+          <span class="risk-stat">Até 80% dos atendimentos são repetitivos</span>
+        </div>
+      </div>
+      <div class="risk-row">
+        <div class="risk-icon">😤</div>
+        <div class="risk-body">
+          <div class="risk-title">Clientes não dão segunda chance</div>
+          <div class="risk-desc">No Brasil, a maioria dos consumidores não tenta de novo após um atendimento ruim.</div>
+          <span class="risk-stat">37% dos brasileiros não dão 2ª chance após mau atendimento</span>
+        </div>
+      </div>
+      <div class="bench-source">Fontes: jttecnologia.com.br (2025), vendedorprofissional.com.br (2025), Juniper Research (2024)</div>
     </div>
   </div>
 
   <!-- ── PERGUNTAS ── -->
-  <div class="perguntas" style="margin-top: 20px;">
+  <div class="perguntas">
     <h3>Perguntas importantes para o lead</h3>
+    <p class="casos-sub">Clique em qualquer card para ver como conduzir a conversa.</p>
+    <div class="perguntas-grid">
 
-    <div class="pergunta-item">
-      <div class="pergunta-q" onclick="toggleQ(this)">Quantas pessoas fazem atendimento hoje e quanto tempo ficam nisso? <span class="arrow">▼</span></div>
-      <div class="pergunta-a">Essa pergunta revela o custo real — que raramente o prospect calcula. Quando você mostrar o número calculado (funcionários × salário × % do tempo), a reação costuma ser de surpresa. Use isso para abrir o racional de economia.<br><span class="pergunta-tip">Use a calculadora acima para mostrar o número ao vivo.</span></div>
-    </div>
+      <div class="pq-card" onclick="togglePQ(this)">
+        <div class="pq-top">
+          <div class="pq-icon">💰</div>
+          <div class="pq-q">Quantas pessoas fazem atendimento e quanto tempo ficam nisso?</div>
+          <div class="pq-arrow">▼</div>
+        </div>
+        <div class="pq-a">Essa pergunta revela o custo real — que raramente o prospect calcula. Quando você mostrar o número calculado (funcionários × salário × % do tempo), a reação costuma ser de surpresa. Use isso para abrir o racional de economia.
+          <span class="pergunta-tip">Use a calculadora acima para mostrar o número ao vivo.</span>
+        </div>
+      </div>
 
-    <div class="pergunta-item">
-      <div class="pergunta-q" onclick="toggleQ(this)">Que tipo de perguntas chegam com mais frequência? Você consegue listar as 5 mais repetidas? <span class="arrow">▼</span></div>
-      <div class="pergunta-a">Exemplos comuns: "qual o horário de funcionamento?", "ainda tem em estoque?", "como faço para remarcar?", "qual o prazo de entrega?", "quero uma segunda via do boleto". Se o lead conseguir listar 5, ele já está visualizando o que pode ser automatizado — e reconhece o desperdício de tempo do time.<br><span class="pergunta-tip">Cada uma dessas é um ticket repetitivo que pode ser resolvido por automação.</span></div>
-    </div>
+      <div class="pq-card" onclick="togglePQ(this)">
+        <div class="pq-top">
+          <div class="pq-icon">🔁</div>
+          <div class="pq-q">O time precisa responder sempre as mesmas perguntas dos clientes?</div>
+          <div class="pq-arrow">▼</div>
+        </div>
+        <div class="pq-a">Exemplos: "qual o horário?", "como remarco?", "qual o prazo de entrega?", "segunda via do boleto?". Se o lead confirmar que sim, pergunte quantas por dia — isso ajuda a dimensionar o volume automatizável e torna o argumento de economia muito mais concreto.
+          <span class="pergunta-tip">Cada resposta repetida é um atendimento automatizável.</span>
+        </div>
+      </div>
 
-    <div class="pergunta-item">
-      <div class="pergunta-q" onclick="toggleQ(this)">Você sabe quantos leads que entram pelo WhatsApp efetivamente fecham? <span class="arrow">▼</span></div>
-      <div class="pergunta-a">Se a resposta for "não sei" — esse é o argumento dos dashboards. Empresas sem visibilidade de conversão não conseguem melhorar o que não medem. Mostre o painel de "custo da invisibilidade" e pergunte: "Quanto você acha que está perdendo por não saber isso?"<br><span class="pergunta-tip">Ative o toggle "Não sabe" na calculadora para mostrar o potencial perdido.</span></div>
-    </div>
+      <div class="pq-card" onclick="togglePQ(this)">
+        <div class="pq-top">
+          <div class="pq-icon">📊</div>
+          <div class="pq-q">Você sabe quantos leads do WhatsApp efetivamente fecham?</div>
+          <div class="pq-arrow">▼</div>
+        </div>
+        <div class="pq-a">Se a resposta for "não sei" — esse é o argumento dos dashboards. Empresas sem visibilidade de conversão não conseguem melhorar o que não medem. Pergunte: "Quanto você acha que está perdendo por não saber isso?"
+          <span class="pergunta-tip">Ative o toggle "Não sabe" na calculadora para mostrar o potencial perdido.</span>
+        </div>
+      </div>
 
-    <div class="pergunta-item">
-      <div class="pergunta-q" onclick="toggleQ(this)">Quando um cliente fica sem resposta por mais de 10 minutos, o que acontece? <span class="arrow">▼</span></div>
-      <div class="pergunta-a">Essa pergunta traz à tona o churn invisível — o cliente que simplesmente vai embora sem reclamar. Clientes que têm problemas resolvidos rapidamente são 2,4x mais propensos a permanecer fiéis (Forrester, 2024). Cada minuto de espera no WhatsApp tem custo que não aparece em nenhum relatório.<br><span class="pergunta-tip">Argumento ideal para gestores de CS e operações.</span></div>
-    </div>
+      <div class="pq-card" onclick="togglePQ(this)">
+        <div class="pq-top">
+          <div class="pq-icon">⏱️</div>
+          <div class="pq-q">Se um cliente fica 10 min sem resposta no WhatsApp, o que acontece?</div>
+          <div class="pq-arrow">▼</div>
+        </div>
+        <div class="pq-a">Essa pergunta traz à tona o churn invisível — o cliente que vai embora sem reclamar. Clientes com atendimentos resolvidos rápido são 2,4x mais fiéis (Forrester, 2024). Cada minuto de espera tem um custo que não aparece em relatório nenhum.
+          <span class="pergunta-tip">Argumento ideal para gestores de CS e operações.</span>
+        </div>
+      </div>
 
-    <div class="pergunta-item">
-      <div class="pergunta-q" onclick="toggleQ(this)">Vocês já têm alguma automação de atendimento? Como está funcionando? <span class="arrow">▼</span></div>
-      <div class="pergunta-a">Se disserem "sim, temos um bot": pergunte qual a taxa de resolução — isto é, quantos chamados o bot fecha sem precisar de humano. Chatbots simples resolvem 30–50%. IA conversacional chega a 60–86%. A diferença não é tecnologia, é resultado. Se disserem "não": a oportunidade está escancarada — calcule o custo atual e mostre a economia imediata.<br><span class="pergunta-tip">Use a tabela de benchmarks abaixo para mostrar os dados.</span></div>
-    </div>
+      <div class="pq-card" onclick="togglePQ(this)">
+        <div class="pq-top">
+          <div class="pq-icon">🤖</div>
+          <div class="pq-q">Vocês já têm alguma automação de atendimento? Como está funcionando?</div>
+          <div class="pq-arrow">▼</div>
+        </div>
+        <div class="pq-a">Se disserem "sim, temos um bot": pergunte qual a taxa de resolução. Chatbots simples resolvem 30–50% dos atendimentos. IA conversacional chega a 60–86%. A diferença não é tecnologia — é resultado. Se disserem "não": calcule o custo atual e mostre a economia imediata.
+          <span class="pergunta-tip">Use a tabela de benchmarks para mostrar os dados.</span>
+        </div>
+      </div>
 
-    <div class="pergunta-item">
-      <div class="pergunta-q" onclick="toggleQ(this)">Quando a demanda aumenta (sazonalidade, campanha, promoção), o que acontece com o atendimento? <span class="arrow">▼</span></div>
-      <div class="pergunta-a">A maioria responde: "a fila cresce e o time fica sobrecarregado" ou "a gente contrata temporários". Ambas as respostas mostram que escalar atendimento humano tem custo variável alto. Com automação, o pico de demanda não exige contratação — exige configuração. Esse é o argumento de escala sem custo proporcional.<br><span class="pergunta-tip">Conecte com o número de funcionários e salários já preenchidos na calculadora.</span></div>
+      <div class="pq-card" onclick="togglePQ(this)">
+        <div class="pq-top">
+          <div class="pq-icon">📈</div>
+          <div class="pq-q">Quando a demanda aumenta, o que acontece com o atendimento?</div>
+          <div class="pq-arrow">▼</div>
+        </div>
+        <div class="pq-a">A maioria responde: "a fila cresce" ou "a gente contrata temporários". Ambas mostram que escalar atendimento humano tem custo alto. Com automação, o pico de demanda não exige contratação — exige configuração.
+          <span class="pergunta-tip">Conecte com os funcionários e salários já preenchidos na calculadora.</span>
+        </div>
+      </div>
+
     </div>
   </div>
 
   <!-- ── CASOS DE USO ── -->
   <div class="casos">
     <h3>Casos de uso reais — clientes RD Station Conversas</h3>
-    <p class="casos-sub">Exemplos reais da comunidade RD Station de como clientes usam o produto para resolver desafios de atendimento.</p>
+    <p class="casos-sub">Exemplos reais da comunidade RD Station de como clientes resolveram desafios com o produto.</p>
+    <div class="casos-grid">
 
-    <div class="caso-card">
-      <div class="caso-tag">RD Station Conversas</div>
-      <div class="caso-title">Organizar e direcionar leads com etiquetas automáticas</div>
-      <div class="caso-desafio">Desafio: O time precisava organizar e direcionar leads para diferentes fluxos com base em interesses, mas fazia isso manualmente.</div>
-      <div class="caso-solucao">Solução: Usaram etiquetas (tags) no RD Station Conversas vinculadas a segmentações automáticas. Cada lead passou a ser direcionado automaticamente para o fluxo certo sem intervenção humana.</div>
-      <a class="caso-link" href="https://rdconectacomunidade.rdstation.com/s/question/0D5V200002Uw2KV" target="_blank">Ver caso completo na comunidade →</a>
-    </div>
+      <div class="caso-visual">
+        <div class="caso-emoji">🏷️</div>
+        <div class="caso-tag">RD Station Conversas</div>
+        <div class="caso-title">Organizar leads com etiquetas automáticas</div>
+        <div class="caso-desafio"><strong>Desafio:</strong> Direcionar leads para fluxos diferentes manualmente, sem escala.</div>
+        <div class="caso-solucao">Etiquetas vinculadas a segmentações automáticas. Cada lead passou a ser direcionado para o fluxo certo sem intervenção humana.</div>
+        <a class="caso-link" href="https://rdconectacomunidade.rdstation.com/s/question/0D5V200002Uw2KV" target="_blank">Ver na comunidade →</a>
+      </div>
 
-    <div class="caso-card">
-      <div class="caso-tag">RD Station Conversas</div>
-      <div class="caso-title">WhatsApp integrado ao funil para vendas consultivas</div>
-      <div class="caso-desafio">Desafio: Ciclo de venda longo com negociações esfriando por falta de follow-up. Equipe sobrecarregada e histórico de conversas perdido nos celulares dos vendedores.</div>
-      <div class="caso-solucao">Solução: Integração do WhatsApp ao RD CRM com templates por etapa do funil e automação de mensagens baseada no comportamento do lead (ex: proposta não aberta). A extensão centralizou o histórico de conversas e deu contexto ao vendedor antes de cada abordagem.</div>
-      <a class="caso-link" href="https://rdconectacomunidade.rdstation.com/s/question/0D5V200001J2OMZKA3/no-nosso-neg%C3%B3cio-temos-um-ciclo-de-venda-consultivo-como-posso-usar-o-whatsapp-de-forma-integrada-ao-funil-do-rd-crm-para-acelerar-negocia%C3%A7%C3%B5es-e-manter-leads-engajados" target="_blank">Ver caso completo na comunidade →</a>
-    </div>
+      <div class="caso-visual">
+        <div class="caso-emoji">🤝</div>
+        <div class="caso-tag">RD Station Conversas</div>
+        <div class="caso-title">WhatsApp integrado ao funil consultivo</div>
+        <div class="caso-desafio"><strong>Desafio:</strong> Negociações esfriando e histórico perdido nos celulares dos vendedores.</div>
+        <div class="caso-solucao">Templates por etapa do funil e automação por comportamento do lead. Histórico centralizado deu contexto ao vendedor em cada abordagem.</div>
+        <a class="caso-link" href="https://rdconectacomunidade.rdstation.com/s/question/0D5V200001J2OMZKA3/no-nosso-neg%C3%B3cio-temos-um-ciclo-de-venda-consultivo-como-posso-usar-o-whatsapp-de-forma-integrada-ao-funil-do-rd-crm-para-acelerar-negocia%C3%A7%C3%B5es-e-manter-leads-engajados" target="_blank">Ver na comunidade →</a>
+      </div>
 
-    <div class="caso-card">
-      <div class="caso-tag">RD Station Conversas</div>
-      <div class="caso-title">Chatbot para atendimento repetitivo com escalada humana</div>
-      <div class="caso-desafio">Desafio: Leads ficavam sem resposta enquanto o time estava ocupado. O tempo da equipe era gasto em perguntas simples e repetitivas, com pouco espaço para questões complexas.</div>
-      <div class="caso-solucao">Solução: Implementação de chatbot para lidar com as dúvidas repetitivas e transferência automática para atendente humano nos casos complexos. O time passou a receber apenas conversas que realmente precisavam de atenção.</div>
-      <a class="caso-link" href="https://rdconectacomunidade.rdstation.com/s/question/0D5V2000031gRE1" target="_blank">Ver caso completo na comunidade →</a>
-    </div>
+      <div class="caso-visual">
+        <div class="caso-emoji">💬</div>
+        <div class="caso-tag">RD Station Conversas</div>
+        <div class="caso-title">Chatbot com escalada humana inteligente</div>
+        <div class="caso-desafio"><strong>Desafio:</strong> Time gastando tempo com atendimentos simples, sem espaço para casos complexos.</div>
+        <div class="caso-solucao">Chatbot resolve dúvidas repetitivas e transfere automaticamente os casos complexos. O time passou a receber só o que precisava de atenção.</div>
+        <a class="caso-link" href="https://rdconectacomunidade.rdstation.com/s/question/0D5V2000031gRE1" target="_blank">Ver na comunidade →</a>
+      </div>
 
-    <div class="caso-card">
-      <div class="caso-tag">RD Station Marketing + Conversas</div>
-      <div class="caso-title">Eliminar planilhas e WhatsApp pessoal na gestão de leads</div>
-      <div class="caso-desafio">Desafio: Leads gerenciados em planilhas e abordados pelo WhatsApp pessoal dos vendedores. Resultado: falta de visibilidade, histórico perdido e experiência inconsistente para o cliente.</div>
-      <div class="caso-solucao">Solução: Fluxo integrado entre RD Marketing e RD Conversas com passagem de bastão automatizada por qualificação. O vendedor passou a receber o contexto completo do lead antes de abrir a conversa, e o atendimento foi padronizado com respostas rápidas e templates.</div>
-      <a class="caso-link" href="https://rdconectacomunidade.rdstation.com/s/question/0D5V200002ndOmG" target="_blank">Ver caso completo na comunidade →</a>
-    </div>
+      <div class="caso-visual">
+        <div class="caso-emoji">📋</div>
+        <div class="caso-tag">RD Marketing + Conversas</div>
+        <div class="caso-title">Fim das planilhas e do WhatsApp pessoal</div>
+        <div class="caso-desafio"><strong>Desafio:</strong> Leads em planilhas, abordados pelo WhatsApp pessoal. Histórico perdido.</div>
+        <div class="caso-solucao">Passagem de bastão automatizada por qualificação. Vendedor recebe contexto completo antes de abrir a conversa e atendimento padronizado com templates.</div>
+        <a class="caso-link" href="https://rdconectacomunidade.rdstation.com/s/question/0D5V200002ndOmG" target="_blank">Ver na comunidade →</a>
+      </div>
 
-    <div class="caso-card">
-      <div class="caso-tag">RD Station CRM</div>
-      <div class="caso-title">Visibilidade de funil e performance de vendedores em tempo real</div>
-      <div class="caso-desafio">Desafio: Coordenador comercial sem clareza sobre gargalos no funil, motivo dos "losts" e quais vendedores performavam melhor. Decisões tomadas no escuro.</div>
-      <div class="caso-solucao">Solução: Uso de IA (Rê) para insights de performance, relatório de negociações concluídas e gráfico de negociações criadas/vendidas/perdidas em 6 meses para identificar sazonalidade. CRM Live para acompanhamento em tempo real pela gerência.</div>
-      <a class="caso-link" href="https://rdconectacomunidade.rdstation.com/s/question/0D5V200002b2EmZ" target="_blank">Ver caso completo na comunidade →</a>
-    </div>
+      <div class="caso-visual">
+        <div class="caso-emoji">📡</div>
+        <div class="caso-tag">RD Station CRM</div>
+        <div class="caso-title">Funil e performance de vendedores em tempo real</div>
+        <div class="caso-desafio"><strong>Desafio:</strong> Sem clareza sobre gargalos no funil e motivo dos "losts".</div>
+        <div class="caso-solucao">IA para insights de performance + gráfico de atendimentos em 6 meses para identificar sazonalidade. CRM Live para acompanhamento em tempo real.</div>
+        <a class="caso-link" href="https://rdconectacomunidade.rdstation.com/s/question/0D5V200002b2EmZ" target="_blank">Ver na comunidade →</a>
+      </div>
 
-    <div class="caso-card">
-      <div class="caso-tag">RD Station Marketing + CRM</div>
-      <div class="caso-title">Leads imobiliários chegando "frios" para o comercial</div>
-      <div class="caso-desafio">Desafio: Automações rodando mas leads chegando sem entender por que o corretor ligava. Modelo linear de e-mails não preparava o lead para uma compra de alto ticket.</div>
-      <div class="caso-solucao">Solução: Critério de passagem baseado em comportamento (cliques em CTAs estratégicos, consumo recorrente de conteúdo) em vez de tempo. Fluxos com materiais de maturidade, provas sociais e conteúdos aplicados para aquecer o lead antes do contato comercial.</div>
-      <a class="caso-link" href="https://rdconectacomunidade.rdstation.com/s/question/0D5V200002bFQoS" target="_blank">Ver caso completo na comunidade →</a>
+      <div class="caso-visual">
+        <div class="caso-emoji">🏠</div>
+        <div class="caso-tag">RD Marketing + CRM</div>
+        <div class="caso-title">Leads imobiliários chegando "quentes"</div>
+        <div class="caso-desafio"><strong>Desafio:</strong> Leads chegando frios mesmo com automações rodando.</div>
+        <div class="caso-solucao">Passagem baseada em comportamento (cliques em CTAs, consumo de conteúdo) em vez de tempo. Fluxos com provas sociais e conteúdo de maturidade antes do contato comercial.</div>
+        <a class="caso-link" href="https://rdconectacomunidade.rdstation.com/s/question/0D5V200002bFQoS" target="_blank">Ver na comunidade →</a>
+      </div>
+
     </div>
   </div>
 
@@ -479,21 +684,42 @@
 
 <footer>
   RD Station Conversas · Framework de ROI para vendedores<br>
-  Fontes dos benchmarks: Forrester (2024), Gartner (2024), Nielsen Norman Group, ResearchGate, Freshworks CX Benchmark 2025, Pylon Research 2025, Braze Global Customer Engagement Review 2024.<br>
+  Fontes dos benchmarks: Forrester (2024), Gartner (2024), Freshworks CX Benchmark 2025, Pylon Research 2025, ResearchGate, Juniper Research (2024), Meta Business Messaging Policy (2025), jttecnologia.com.br, vendedorprofissional.com.br.<br>
   Casos de uso: Comunidade RD Station (rdconectacomunidade.rdstation.com)
 </footer>
 
 <script>
+var autoRate = 0.30;
+var temRepetitivo = true;
+
+function selectRepetitivo(val) {
+  temRepetitivo = val === 'sim';
+  document.getElementById('btn-sim').className = 'yn-btn' + (temRepetitivo ? ' active-yes' : '');
+  document.getElementById('btn-nao').className = 'yn-btn' + (!temRepetitivo ? ' active-no' : '');
+  document.getElementById('scenarios-box').classList.toggle('visible', temRepetitivo);
+  document.getElementById('no-repetitivo-msg').classList.toggle('visible', !temRepetitivo);
+  if (!temRepetitivo) autoRate = 0;
+  else autoRate = 0.30;
+  calc();
+}
+
+function selectScenario(pct) {
+  [10,30,50].forEach(function(p) {
+    document.getElementById('sc'+p).classList.toggle('active', p === pct);
+  });
+  autoRate = pct / 100;
+  calc();
+}
+
 function toggleBlind() {
   var isBlind = document.getElementById('toggle-blind').checked;
   document.getElementById('conv-known').classList.toggle('visible', !isBlind);
   document.getElementById('blindspot-panel').classList.toggle('visible', isBlind);
   document.getElementById('stat-receita').classList.toggle('dimmed', isBlind);
-  document.getElementById('stat-anual').classList.toggle('dimmed', isBlind);
   document.getElementById('rational-receita-row').style.opacity = isBlind ? '0.3' : '1';
   var roiBox = document.getElementById('roi-box');
   if (isBlind) {
-    roiBox.style.background = '#1E3A5F';
+    roiBox.style.background = '#475569';
     document.getElementById('roi-title').textContent = 'ROI parcial (só custo operacional)';
     document.getElementById('roi-sub').textContent = 'Receita incremental não calculada — use o painel vermelho como argumento de venda dos dashboards.';
   } else {
@@ -504,10 +730,9 @@ function toggleBlind() {
   calc();
 }
 
-function toggleQ(el) {
+function togglePQ(el) {
   el.classList.toggle('open');
-  var ans = el.nextElementSibling;
-  ans.classList.toggle('open');
+  el.querySelector('.pq-a').classList.toggle('open');
 }
 
 function fmt(n) { return 'R$' + Math.round(n).toLocaleString('pt-BR'); }
@@ -518,73 +743,72 @@ function calc() {
   var salario = +document.getElementById('s-salario').value;
   var tempo   = +document.getElementById('s-tempo').value / 100;
   var atend   = +document.getElementById('s-atend').value;
-  var autoRate = +document.getElementById('s-auto').value / 100;
   var leads   = +document.getElementById('s-leads').value;
   var ticket  = +document.getElementById('s-ticket').value;
   var plano   = +document.getElementById('s-plano').value;
   var investAnual = plano * 12;
   var isBlind = document.getElementById('toggle-blind').checked;
 
-  document.getElementById('v-func').textContent       = func;
-  document.getElementById('v-salario').textContent    = fmt(salario);
-  document.getElementById('v-tempo').textContent      = Math.round(tempo * 100) + '%';
-  document.getElementById('v-atend').textContent      = fmtN(atend);
-  document.getElementById('v-auto').textContent       = Math.round(autoRate * 100) + '%';
-  document.getElementById('v-leads').textContent      = fmtN(leads);
-  document.getElementById('v-ticket').textContent     = fmt(ticket);
-  document.getElementById('v-plano').textContent      = fmt(plano) + '/mês';
+  // Update display values
+  document.getElementById('v-func').textContent    = func;
+  document.getElementById('v-salario').textContent = fmt(salario);
+  document.getElementById('v-tempo').textContent   = Math.round(tempo*100) + '%';
+  document.getElementById('v-atend').textContent   = fmtN(atend);
+  document.getElementById('v-leads').textContent   = fmtN(leads);
+  document.getElementById('v-ticket').textContent  = fmt(ticket);
+  document.getElementById('v-plano').textContent   = fmt(plano) + '/mês';
   document.getElementById('d-plano-anual').textContent = fmt(investAnual);
 
-  // Custo de atendimento
-  var custoMensal = func * salario * tempo;
-  var custoPorAtend = atend > 0 ? custoMensal / atend : 0;
-  var conversasAuto = Math.round(atend * autoRate);
-  var economiaMes = custoMensal * autoRate;
+  var custoMensal    = func * salario * tempo;
+  var custoPorAtend  = atend > 0 ? custoMensal / atend : 0;
+  var atendAuto      = Math.round(atend * autoRate);
+  var economiaMes    = custoMensal * autoRate;        // automação total
+  var economiaParcial = custoMensal * 0.15;           // automação parcial: 1ª resposta, coleta dados, 24/7
 
-  document.getElementById('d-custo-total').textContent  = fmt(custoMensal) + '/mês';
-  document.getElementById('d-custo-por').textContent    = fmt(custoPorAtend) + '/conversa';
-  document.getElementById('d-tickets-auto').textContent = fmtN(conversasAuto) + ' conversas/mês';
-  document.getElementById('r-economia').textContent     = fmt(economiaMes) + '/mês';
+  document.getElementById('d-custo-total').textContent = fmt(custoMensal) + '/mês';
+  document.getElementById('d-custo-por').textContent   = fmt(custoPorAtend) + '/atend.';
+  document.getElementById('r-economia').textContent    = fmt(economiaMes) + '/mês';
+  document.getElementById('r-parcial').textContent     = fmt(economiaParcial) + '/mês';
 
-  // Rational lines
-  document.getElementById('f1').textContent  = func + ' func. × ' + fmt(salario) + ' × ' + Math.round(tempo*100) + '%';
-  document.getElementById('rr1').textContent = fmt(custoMensal) + '/mês';
-  document.getElementById('f2').textContent  = fmtN(atend) + ' conv. × ' + Math.round(autoRate*100) + '%';
-  document.getElementById('rr2').textContent = fmtN(conversasAuto) + ' conversas';
-  document.getElementById('f3').textContent  = fmt(custoMensal) + ' × ' + Math.round(autoRate*100) + '%';
-  document.getElementById('rr3').textContent = fmt(economiaMes) + '/mês';
+  // Update scenario cards with economy values
+  [10,30,50].forEach(function(pct) {
+    var econ = custoMensal * (pct/100);
+    document.getElementById('sc'+pct+'-val').textContent = 'Economia: ' + fmt(econ) + '/mês';
+  });
 
-  document.getElementById('f6').textContent  = fmt(plano) + ' × 12';
-  document.getElementById('rr6').textContent = fmt(investAnual);
+  // Rational
+  document.getElementById('f1').textContent   = func + ' func. × ' + fmt(salario) + ' × ' + Math.round(tempo*100) + '%';
+  document.getElementById('rr1').textContent  = fmt(custoMensal) + '/mês';
+  document.getElementById('f2').textContent   = fmtN(atend) + ' atend. × ' + Math.round(autoRate*100) + '%';
+  document.getElementById('rr2').textContent  = fmtN(atendAuto) + ' atendimentos';
+  document.getElementById('f3').textContent   = fmt(custoMensal) + ' × ' + Math.round(autoRate*100) + '%';
+  document.getElementById('rr3').textContent  = fmt(economiaMes) + '/mês';
+  document.getElementById('rr3b').textContent = fmt(economiaParcial) + '/mês';
+  document.getElementById('f6').textContent   = fmt(plano) + ' × 12';
+  document.getElementById('rr6').textContent  = fmt(investAnual);
 
   if (isBlind) {
-    var benchConv = 0.05;
-    var receitaPot = leads * benchConv * ticket;
-    var leadsSemFollowup = Math.round(leads * 0.40);
+    var receitaPot = leads * 0.05 * ticket;
     document.getElementById('bs1').textContent = fmt(receitaPot);
-    document.getElementById('bs2').textContent = fmtN(leadsSemFollowup) + ' leads';
+    document.getElementById('bs2').textContent = fmtN(Math.round(leads * 0.40)) + ' atend.';
     document.getElementById('r-receita').textContent = '—';
-    document.getElementById('r-anual').textContent   = '—';
-    document.getElementById('f4').textContent        = 'não calculado';
-    document.getElementById('rr4').textContent       = '—';
-    var totalAnualBlind = economiaMes * 12;
-    document.getElementById('f5').textContent  = fmt(economiaMes) + ' × 12';
+    document.getElementById('f4').textContent  = 'não calculado';
+    document.getElementById('rr4').textContent = '—';
+    var totalAnualBlind = (economiaMes + economiaParcial) * 12;
+    document.getElementById('r-anual').textContent   = fmt(totalAnualBlind);
+    document.getElementById('f5').textContent  = '(' + fmt(economiaMes) + ' + ' + fmt(economiaParcial) + ') × 12';
     document.getElementById('rr5').textContent = fmt(totalAnualBlind);
-    var roiBlind = investAnual > 0 ? totalAnualBlind / investAnual : 0;
-    document.getElementById('r-roi').textContent = roiBlind.toFixed(1) + 'x';
+    document.getElementById('r-roi').textContent = investAnual > 0 ? (totalAnualBlind/investAnual).toFixed(1)+'x' : '0x';
   } else {
-    var conv = +document.getElementById('s-conv').value / 100;
-    document.getElementById('v-conv').textContent = Math.round(conv * 100) + '%';
     var receitaIncr = leads * 0.05 * ticket;
-    var totalAnual  = (economiaMes + receitaIncr) * 12;
-    var roi = investAnual > 0 ? totalAnual / investAnual : 0;
+    var totalAnual  = (economiaMes + economiaParcial + receitaIncr) * 12;
     document.getElementById('r-receita').textContent = fmt(receitaIncr) + '/mês';
     document.getElementById('r-anual').textContent   = fmt(totalAnual);
-    document.getElementById('f4').textContent  = fmtN(leads) + ' leads × 5% conv. × ' + fmt(ticket);
+    document.getElementById('f4').textContent  = fmtN(leads) + ' × 5% × ' + fmt(ticket);
     document.getElementById('rr4').textContent = fmt(receitaIncr) + '/mês';
-    document.getElementById('f5').textContent  = '(' + fmt(economiaMes) + ' + ' + fmt(receitaIncr) + ') × 12';
+    document.getElementById('f5').textContent  = '(' + fmt(economiaMes) + ' + ' + fmt(economiaParcial) + ' + ' + fmt(receitaIncr) + ') × 12';
     document.getElementById('rr5').textContent = fmt(totalAnual);
-    document.getElementById('r-roi').textContent = roi.toFixed(1) + 'x';
+    document.getElementById('r-roi').textContent = investAnual > 0 ? (totalAnual/investAnual).toFixed(1)+'x' : '0x';
   }
 }
 
