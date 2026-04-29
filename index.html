@@ -204,6 +204,68 @@
     <h2>Como usar esta ferramenta</h2>
     <p>Preencha os campos abaixo com os dados do prospect durante a descoberta. <strong>Se o cliente não souber um dado, use as estimativas de cenário.</strong> Mostre o número de ROI antes de revelar o preço da ferramenta.</p>
   </div>
+  
+  <div class="card" style="margin-bottom: 28px; border: 2px solid #00A896;">
+  <h3>Identificação da Simulação</h3>
+  <form id="registroForm">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+      <div class="field">
+        <label>Seu Nome</label>
+        <select id="vendedor_nome" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #E2E8F0; background: white; height: 40px;">
+         <option value="" disabled selected>Selecione seu nome...</option>
+         <option value="Mayara Alves">Mayara Alves</option>
+         <option value="Gabriela Sousa">Gabriela Sousa</option>
+         <option value="Mellory Oliveira">Mellory Oliveira</option>
+         </select>
+      </div>
+      
+      <div class="field">
+        <label>Número da Oportunidade (Salesforce)</label>
+        <input type="text" id="sf_id" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #E2E8F0;">
+      </div>
+    </div>
+    <button type="submit" id="btnSalvar" style="width: 100%; background: #00A896; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px;">
+      Salvar na Planilha
+    </button>
+  </form>
+  <p id="msgSucesso" style="display:none; color: #059669; font-size: 13px; margin-top: 10px; text-align: center; font-weight: bold;">
+    ✔ Dados salvos com sucesso!
+  </p>
+</div>
+
+<script>
+document.getElementById('registroForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  
+  const btn = document.getElementById('btnSalvar');
+  const msg = document.getElementById('msgSucesso');
+  const nome = document.getElementById('vendedor_nome').value;
+  const opp = document.getElementById('sf_id').value;
+
+  btn.innerText = "Salvando...";
+  btn.disabled = true;
+
+  // URL que você vai gerar no Passo 2
+  const URL_SCRIPT = 'https://script.google.com/macros/s/AKfycbzq6Zt6Lcknr918f5FIlTYJi-hO0cabcK7LK3iHGQAiYKtJeHyHo9hWwUfIc6d0McLN/exec';
+
+  // Enviando os dados via URL (mais simples e evita erros)
+  fetch(`${URL_SCRIPT}?nome=${encodeURIComponent(nome)}&oportunidade=${encodeURIComponent(opp)}`, {
+    method: 'GET',
+    mode: 'no-cors'
+  })
+  .then(() => {
+    msg.style.display = "block";
+    btn.innerText = "Salvo!";
+    btn.style.background = "#94A3B8";
+  })
+  .catch(err => {
+    console.error(err);
+    alert("Erro ao salvar.");
+    btn.disabled = false;
+    btn.innerText = "Tentar novamente";
+  });
+});
+</script>
 
   <!-- ── BLOCO 1 ── -->
   <p class="section-title">1. Custo atual de atendimento</p>
